@@ -12,8 +12,14 @@ const createBooking = async(req, res) =>{
             registerAddress,
             quantity,
             payPrice,
-            customerFirstName,
-            customerLastName } = req.body; 
+            customerName,
+            customerPassport,
+            customerType,
+            numberOfAdult,
+            numberOfTeen,
+            numberOfChildren,
+            numberOfInfant,
+            status } = req.body; 
         
         const respond = await BookingService.createBooking(req.body, tourId);
 
@@ -28,9 +34,7 @@ const createBooking = async(req, res) =>{
 //get all tour
 const getAllBooking = async(req,res) =>{
     try {
-        const books = await Booking.find({
-            registerEmail: "c@gmail.com"
-        });
+        const books = await Booking.find();
         return res.status(200).json({status: true,message: "Successful", books})
     } catch (error) {
         return res.status(500).json({success:false,message:"internal server error"});
@@ -42,7 +46,7 @@ const getBooking = async(req,res) =>{
     const id = req.params.id
     try {
         const book = await Booking.findById(id)
-        return res.status(200).json({success:true,message:"Successful", data:book})
+        return res.status(200).json({success:true,message:"Successful", book})
     } catch (error) {
         return res.status(404).json({success:false,message:"not found"});
     }
@@ -109,15 +113,69 @@ const bookingCount = async(req,res) =>{
 const getBookedTour = async(req, res) => {
     try {
         const email = req.query.email;        
-        // const response = await BookingService.getBookedTour(email);
-
-        // return res.status(200).json(response);
-
         const checkEmail = await Booking.find({
             registerEmail: email
         });
 
         return res.status(200).json({status: true,message: "Successful", checkEmail})
+    } catch (error) {
+        return res.status(404).json({
+            message: error
+        });
+    }
+}
+
+// Phân trang cho Booking 
+const getAllTourPage = async(req, res) => {
+    try {
+        const perPage = 6;
+        const page = req.params.page ? req.params.page : 1;
+        const books = await Booking
+        .find({})
+        // .select("-photo")
+        .skip((page - 1) * perPage)
+        .limit(perPage)
+        .sort({ createdAt: -1 });
+        return res.status(200).json({status: true,message: "Successful", books})    
+    } catch (error) {
+        return res.status(404).json({
+            message: error
+        });
+    }
+}
+
+// Filter booking theo ngày
+const filterBooking = async(req, res) => {
+    try {
+        const dateInput = new Date(req.query.date);
+
+        const day = dateInput.getDate();
+        const month = dateInput.getMonth() + 1;
+
+        const checkDate = await Booking.find({
+            $and: [
+                { $expr: { $eq: [{ $dayOfMonth: "$createdAt" }, day] } },
+                { $expr: { $eq: [{ $month: "$createdAt" }, month] } }
+              ]
+        });
+        return res.status(200).json({status: true,message: "Successful", checkDate}) 
+    } catch (error) {
+        return res.status(404).json({
+            message: error
+        });
+    }
+}
+
+// search 
+const searchBooking = async(req, res) => {
+    try {
+        const email = req.query.email; 
+
+        const checkEmail = await Booking.find({
+            registerEmail: email
+        })
+
+        return res.status(200).json({status: true,message: "Successful", checkEmail}) 
     } catch (error) {
         return res.status(404).json({
             message: error
@@ -132,5 +190,8 @@ module.exports = {
     updateBooking,
     deleteBooking,
     bookingCount,
-    getBookedTour
+    getBookedTour,
+    getAllTourPage,
+    filterBooking,
+    searchBooking
 }

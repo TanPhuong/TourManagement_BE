@@ -10,8 +10,14 @@ const createBooking = (newBooking, tourId) => {
             registerAddress,
             quantity,
             payPrice,
-            customerFirstName,
-            customerLastName } = newBooking;
+            customerName,
+            customerPassport,
+            customerType,
+            numberOfAdult,
+            numberOfTeen,
+            numberOfChildren,
+            numberOfInfant,
+            status } = newBooking;
         try {
             // const checkTour = await Tour.findOne({
             //     _id: tourId
@@ -26,12 +32,18 @@ const createBooking = (newBooking, tourId) => {
                 registerAddress,
                 quantity,
                 payPrice,
-                customerFirstName,
-                customerLastName })
+                customerName,
+                customerPassport,
+                customerType,
+                numberOfAdult,
+                numberOfTeen,
+                numberOfChildren,
+                numberOfInfant,
+                status })
             if(newBooking) {
                 resolve({
                     status: 'Success',
-                    data: newBooking
+                    newBooking
                 })
             }   
         }catch (error) {

@@ -1,5 +1,8 @@
 const TourService = require('../services/TourService');
 const fs = require('fs');
+const Booking = require('../models/BookingModel')
+const Tour = require('../models/TourModel');
+
 
 
 // Create Tour  
@@ -148,11 +151,142 @@ const listTour = async (req, res) => {
     }
 }
 
+// const revenueTour = async (req, res) => {
+//     try {
+//         const response = await TourService.getListTour()
+        
+//         // const tours = response.allTour;
+//         // let tourRevenues = [];
+//         // for (const tour of tours){
+//         //     const bookings = await Booking.find({ Tour: tour._id }).populate('TourR');
+//         //     if(bookings.length > 0){
+//         //         let totalRevenue = 0;
+//         //     bookings.forEach((booking) =>{
+//         //         const {
+//         //             numberOfAdult,
+//         //             numberOfTeen,
+//         //             numberOfChildren,
+//         //             numberOfInfant
+//         //         } = booking;
+//         //             const {
+//         //             adultPrice,
+//         //             teenPrice,
+//         //             childrenPrice,
+//         //             infantPrice
+//         //         } = booking.tour;
+                
+//         //         const bookingRevenue = (numberOfAdult * adultPrice) + (numberOfTeen * teenPrice) + (numberOfChildren * childrenPrice) + (numberOfInfant * infantPrice);
+//         //         totalRevenue += bookingRevenue;
+                
+//         //     });
+//         //     // Cập nhật trường totalRevenue của tour
+//         //     await Tour.findByIdAndUpdate(tour._id ,{totalRevenue} );
+//         //     tourRevenues.push({
+//         //         tourId: tour._id,
+//         //         tourName: tour.nameTour,
+//         //         totalRevenue: totalRevenue,
+//         //     });
+//         //     }
+//         // }
+        
+//         return res.status(200).json({ tourRevenues });
+//     }catch (error) {
+//         return res.status(404).json({ message: error });
+//     }
+// }
+
+
+const revenueTour = async(req,res) =>{
+    try {
+        const response = await TourService.getListTour()
+        const tours = response.allTour;
+        let tourRevenues = [];
+        for (const tour of tours){
+            const bookings = await Booking.find({ TourR: tour._id }).populate('TourR');
+            console.log(bookings)
+            if(bookings.length > 0){
+                let totalRevenue = 0;
+            bookings.forEach((booking) =>{
+                const {
+                    numberOfAdult,
+                    numberOfTeen,
+                    numberOfChildren,
+                    numberOfInfant,
+                } = booking;
+                    const {
+                    adultPrice,
+                    teenPrice,
+                    childrenPrice,
+                    infantPrice,
+                } = booking.TourR;
+                const bookingRevenue = (numberOfAdult * adultPrice) + (numberOfTeen * teenPrice) + (numberOfChildren * childrenPrice) + (numberOfInfant * infantPrice);
+                totalRevenue += bookingRevenue;
+                
+            });
+            // Cập nhật trường totalRevenue của tour
+            await Tour.findByIdAndUpdate(tour._id ,{totalRevenue} );
+            tourRevenues.push({
+          tourId: tour._id,
+          tourName: tour.nameTour,
+          totalRevenue: totalRevenue,
+        });
+            }
+        }
+        
+        return res.status(200).json({ tourRevenues });
+    }catch (error) {
+  console.error('Error fetching tours:', error);
+  return res.status(500).json({ message: error });
+}
+}
+
+
+// detail Tour 
+const detailTourBooking = async (req, res) => {
+    try {
+        const tourId = req.query.id
+
+        if(!tourId){
+            return res.status(200).json({
+                status: 'ERR',
+                message: 'Lỗi'
+            })
+        }
+        const response = await TourService.detailTour(tourId)
+
+        return res.status(200).json(response)
+
+    }catch(error) {
+        return res.status(404).json({
+            message: error
+        });
+    }
+}
+
+// search 
+const searchTour = async(req, res) => {
+    try {
+        const tour = req.query.place; 
+
+        const checkTour = await Tour.find({
+            visitedPlace: tour
+        })
+
+        return res.status(200).json({status: true,message: "Successful", checkTour}) 
+    } catch (error) {
+        return res.status(404).json({
+            message: error
+        });
+    }
+}
 
 module.exports = {
     createTour,
     updateTour,
     detailTour,
     deleteTour,
-    listTour
+    listTour,
+    revenueTour,
+    detailTourBooking,
+    searchTour
 }

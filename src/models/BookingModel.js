@@ -2,7 +2,8 @@ const mongoose = require('mongoose');
 const bookingSchema = new mongoose.Schema(
     {
         TourR: {
-            type: String
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Tour'
         },
         registerName: {
             type: String,
@@ -25,12 +26,37 @@ const bookingSchema = new mongoose.Schema(
         payPrice: {
             type: Number
         },
-        customerFirstName: [{
+        customerName: [{
             type: String
         }],
-        customerLastName: [{
+        customerPassport: [{
             type: String
-        }]
+        }],
+        customerType: [{
+            type: String
+        }],
+        status: {
+            type: String,
+            default: "Chưa thanh toán"
+        },
+        numberOfAdult: {
+            type: Number
+        }, 
+        numberOfTeen: {
+            type: Number
+        },
+        numberOfChildren: {
+            type: Number
+        },
+        numberOfInfant: {
+            type: Number
+        },
+        paymentMethod: {
+            type: String
+        }
+    },
+    {
+        timestamps: true
     }
 )
 

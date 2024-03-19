@@ -9,5 +9,8 @@ router.put('/update/:id', bookingController.updateBooking);
 router.delete('/delete/:id', bookingController.deleteBooking);
 router.get('/count',bookingController.bookingCount);
 router.get('/my-tour',bookingController.getBookedTour);
+router.get('/get-booking/:page', bookingController.getAllTourPage);
+router.get('/filter-booking', bookingController.filterBooking)
+router.get('/search-booking', bookingController.searchBooking)
 
 module.exports = router;

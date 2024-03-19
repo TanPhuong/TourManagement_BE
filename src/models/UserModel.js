@@ -34,12 +34,7 @@ const userSchema = new mongoose.Schema(
         // refresh_token: {
         //     type: String,
         //     required: true
-        // },
-        // tour: {
-        //     nameTour: {type: String, required: true},
-        //     price: {type: Number, required: true},
-        //     status: {type: String, required: true, default: "Chưa thanh toán"}
-        // },
+        // }
         order: {
             type: mongoose.Schema.Types.ObjectId, 
             ref: 'Booking'

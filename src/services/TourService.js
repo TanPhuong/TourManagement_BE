@@ -19,7 +19,6 @@ const createTour = (newTour) => {
                     message: 'The name tour is already'
                 })
             }
-
             
 
             const newTour = await Tour.create({

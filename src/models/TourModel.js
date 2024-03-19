@@ -18,7 +18,7 @@ const tourSchema = new mongoose.Schema(
             required: true
         },
         departureDate: {
-            type: Date,
+            type: String,
             required: true
         },
         departureTime: {
@@ -37,10 +37,12 @@ const tourSchema = new mongoose.Schema(
             required: true
         },
         childrenPrice: {
-            type: Number
+            type: Number,
+            default: 0
         },
         infantPrice: {
-            type: Number
+            type: Number,
+            default: 0
         },
         quantity: {
             type: Number,
@@ -60,7 +62,8 @@ const tourSchema = new mongoose.Schema(
             type: String
         },
         suitableObject: {
-            type: String
+            type: String,
+            default: "Mọi người"
         },
         bestTimetogo: {
             type: String,
@@ -74,6 +77,10 @@ const tourSchema = new mongoose.Schema(
             type: Number,
             default: 0
         },
+        totalRevenue: {
+            type: Number,
+            default: 0
+        }
     }
 )
 

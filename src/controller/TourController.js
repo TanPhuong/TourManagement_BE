@@ -139,61 +139,43 @@ const deleteTour = async (req, res) => {
 }
 
 // list Tour 
-const listTour = async (req, res) => {
-    try {
-        const response = await TourService.getListTour()
-        return res.status(200).json(response)
-
-    }catch(error) {
-        return res.status(404).json({
-            message: error
-        });
-    }
-}
-
-// const revenueTour = async (req, res) => {
+// const listTour = async (req, res) => {
 //     try {
 //         const response = await TourService.getListTour()
-        
-//         // const tours = response.allTour;
-//         // let tourRevenues = [];
-//         // for (const tour of tours){
-//         //     const bookings = await Booking.find({ Tour: tour._id }).populate('TourR');
-//         //     if(bookings.length > 0){
-//         //         let totalRevenue = 0;
-//         //     bookings.forEach((booking) =>{
-//         //         const {
-//         //             numberOfAdult,
-//         //             numberOfTeen,
-//         //             numberOfChildren,
-//         //             numberOfInfant
-//         //         } = booking;
-//         //             const {
-//         //             adultPrice,
-//         //             teenPrice,
-//         //             childrenPrice,
-//         //             infantPrice
-//         //         } = booking.tour;
-                
-//         //         const bookingRevenue = (numberOfAdult * adultPrice) + (numberOfTeen * teenPrice) + (numberOfChildren * childrenPrice) + (numberOfInfant * infantPrice);
-//         //         totalRevenue += bookingRevenue;
-                
-//         //     });
-//         //     // Cập nhật trường totalRevenue của tour
-//         //     await Tour.findByIdAndUpdate(tour._id ,{totalRevenue} );
-//         //     tourRevenues.push({
-//         //         tourId: tour._id,
-//         //         tourName: tour.nameTour,
-//         //         totalRevenue: totalRevenue,
-//         //     });
-//         //     }
-//         // }
-        
-//         return res.status(200).json({ tourRevenues });
-//     }catch (error) {
-//         return res.status(404).json({ message: error });
+//         return res.status(200).json(response)
+
+//     }catch(error) {
+//         return res.status(404).json({
+//             message: error
+//         });
 //     }
 // }
+
+const listTour = async (req, res) => {
+    try {
+        const page = parseInt(req.params.page) || 1; 
+        const perPage = 6;
+
+        const totalTour = await Tour.countDocuments();
+        const totalPages = Math.ceil(totalTour / perPage);
+        const skip = (page - 1) * perPage;
+
+        const tour = await Tour.find().skip(skip).limit(perPage); 
+        return res.status(200).json({
+            status: 'Ok',
+            message: 'success', 
+            page,
+            totalPages,
+            tour,
+            totalTour
+        })
+
+    } catch (e) {
+        return res.status(404).json({
+            message: e
+        })
+    }
+}
 
 
 const revenueTour = async(req,res) =>{
@@ -226,9 +208,9 @@ const revenueTour = async(req,res) =>{
             // Cập nhật trường totalRevenue của tour
             await Tour.findByIdAndUpdate(tour._id ,{totalRevenue} );
             tourRevenues.push({
-          tourId: tour._id,
-          tourName: tour.nameTour,
-          totalRevenue: totalRevenue,
+                tourId: tour._id,
+                tourName: tour.nameTour,
+                totalRevenue: totalRevenue,
         });
             }
         }
@@ -269,7 +251,7 @@ const searchTour = async(req, res) => {
         const tour = req.query.place; 
 
         const checkTour = await Tour.find({
-            visitedPlace: tour
+            visitedPlace: { $regex: tour, $options: 'i' }
         })
 
         return res.status(200).json({status: true,message: "Successful", checkTour}) 
